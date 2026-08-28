@@ -1,0 +1,158 @@
+/* Global Design Tokens & Resets for Academic Look */
+:root {
+  --bg-primary: #fcfdfd;
+  --bg-secondary: #f3f4f6;
+  --bg-card: #ffffff;
+  
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-light: #9ca3af;
+  
+  --color-academic: #1e3a8a; /* Academic Dark Blue */
+  --color-accent: #2563eb;
+  --color-border: #e5e7eb;
+  
+  --color-positive: #059669; /* Emerald Green */
+  --color-positive-bg: #ecfdf5;
+  --color-negative: #dc2626; /* Crimson Red */
+  --color-negative-bg: #fef2f2;
+  
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Georgia', 'Times New Roman', Times, serif; /* Editorial Academic Feel */
+  
+  --border-radius: 4px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  
+  --max-width: 1200px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Card Styling */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-academic);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+}
+
+/* Button Styling */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--color-academic);
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background-color: #172554;
+  text-decoration: none;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border-color: var(--color-academic);
+  color: var(--color-academic);
+}
+.btn-secondary:hover {
+  background-color: #f0f4fe;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Page Headers */
+.page-header {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--color-academic);
+  padding-bottom: 1rem;
+}
+
+.page-title {
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-academic);
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+/* Alerts / Callouts */
+.alert {
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  border-left: 4px solid transparent;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.alert-info {
+  background-color: #eff6ff;
+  border-left-color: var(--color-accent);
+  color: #1e40af;
+}
+
+.alert-warning {
+  background-color: #fffbeb;
+  border-left-color: #d97706;
+  color: #92400e;
+}

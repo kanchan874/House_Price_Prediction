@@ -1,0 +1,233 @@
+{
+  "Linear Regression": [
+    {
+      "feature": "YearRemodAdd",
+      "importance": 0.44815926481066193,
+      "raw_importance": 54768677.80081849
+    },
+    {
+      "feature": "YearBuilt",
+      "importance": 0.38678917882365593,
+      "raw_importance": 47268758.17414095
+    },
+    {
+      "feature": "OverallQual",
+      "importance": 0.06100708462640097,
+      "raw_importance": 7455557.9318040935
+    },
+    {
+      "feature": "GrLivArea",
+      "importance": 0.026350130323805992,
+      "raw_importance": 3220198.5120709566
+    },
+    {
+      "feature": "1stFlrSF",
+      "importance": 0.01885162429182755,
+      "raw_importance": 2303820.578823439
+    },
+    {
+      "feature": "TotalBsmtSF",
+      "importance": 0.01258339770109048,
+      "raw_importance": 1537792.718893689
+    },
+    {
+      "feature": "Neighborhood",
+      "importance": 0.007736751116614142,
+      "raw_importance": 945493.4046939329
+    },
+    {
+      "feature": "BedroomAbvGr",
+      "importance": 0.00729657352482681,
+      "raw_importance": 891700.1517307799
+    },
+    {
+      "feature": "GarageCars",
+      "importance": 0.007117603475972497,
+      "raw_importance": 869828.5678735551
+    },
+    {
+      "feature": "GarageArea",
+      "importance": 0.005929607598888504,
+      "raw_importance": 724645.8872294261
+    },
+    {
+      "feature": "2ndFlrSF",
+      "importance": 0.005274304356066659,
+      "raw_importance": 644562.544127942
+    },
+    {
+      "feature": "LotArea",
+      "importance": 0.004364707592833778,
+      "raw_importance": 533402.4812533836
+    },
+    {
+      "feature": "Fireplaces",
+      "importance": 0.0033303522751277357,
+      "raw_importance": 406995.9165002504
+    },
+    {
+      "feature": "FullBath",
+      "importance": 0.002872222284258104,
+      "raw_importance": 351008.73553361057
+    },
+    {
+      "feature": "TotRmsAbvGrd",
+      "importance": 0.002337197197969007,
+      "raw_importance": 285624.3535356117
+    }
+  ],
+  "Explainable Boosting Machine": [
+    {
+      "feature": "Neighborhood",
+      "importance": 0.2632169694760615,
+      "raw_importance": 2689370.076961994
+    },
+    {
+      "feature": "OverallQual",
+      "importance": 0.09878080031536383,
+      "raw_importance": 1009274.3225305538
+    },
+    {
+      "feature": "2ndFlrSF",
+      "importance": 0.08113423429679437,
+      "raw_importance": 828973.8399821016
+    },
+    {
+      "feature": "TotalBsmtSF",
+      "importance": 0.07784472829387633,
+      "raw_importance": 795363.9286232551
+    },
+    {
+      "feature": "YearRemodAdd",
+      "importance": 0.06839983498050338,
+      "raw_importance": 698862.5005137968
+    },
+    {
+      "feature": "GrLivArea",
+      "importance": 0.0666941831591651,
+      "raw_importance": 681435.3225504853
+    },
+    {
+      "feature": "YearBuilt",
+      "importance": 0.06438755142549545,
+      "raw_importance": 657867.7449150078
+    },
+    {
+      "feature": "Fireplaces",
+      "importance": 0.05711270693270534,
+      "raw_importance": 583538.3841127561
+    },
+    {
+      "feature": "1stFlrSF",
+      "importance": 0.05547250441287792,
+      "raw_importance": 566779.9221269581
+    },
+    {
+      "feature": "LotArea",
+      "importance": 0.054676814253004365,
+      "raw_importance": 558650.1069757672
+    },
+    {
+      "feature": "GarageCars",
+      "importance": 0.03384407775542133,
+      "raw_importance": 345795.52442603064
+    },
+    {
+      "feature": "GarageArea",
+      "importance": 0.027414923756504478,
+      "raw_importance": 280106.84782100643
+    },
+    {
+      "feature": "BedroomAbvGr",
+      "importance": 0.019623919419870312,
+      "raw_importance": 200503.72050694228
+    },
+    {
+      "feature": "FullBath",
+      "importance": 0.016074422537124693,
+      "raw_importance": 164237.40103777102
+    },
+    {
+      "feature": "TotRmsAbvGrd",
+      "importance": 0.015322328985231675,
+      "raw_importance": 156553.02606163145
+    }
+  ],
+  "Random Forest": [
+    {
+      "feature": "OverallQual",
+      "importance": 0.6108102515566688,
+      "raw_importance": 0.6108102515566688
+    },
+    {
+      "feature": "GrLivArea",
+      "importance": 0.11348046152923086,
+      "raw_importance": 0.11348046152923086
+    },
+    {
+      "feature": "1stFlrSF",
+      "importance": 0.046222598736885584,
+      "raw_importance": 0.046222598736885584
+    },
+    {
+      "feature": "TotalBsmtSF",
+      "importance": 0.04183550128099978,
+      "raw_importance": 0.04183550128099978
+    },
+    {
+      "feature": "LotArea",
+      "importance": 0.027949034221459234,
+      "raw_importance": 0.027949034221459234
+    },
+    {
+      "feature": "2ndFlrSF",
+      "importance": 0.02780021410351878,
+      "raw_importance": 0.02780021410351878
+    },
+    {
+      "feature": "GarageArea",
+      "importance": 0.024295087320521137,
+      "raw_importance": 0.024295087320521137
+    },
+    {
+      "feature": "YearBuilt",
+      "importance": 0.021007904503957894,
+      "raw_importance": 0.021007904503957894
+    },
+    {
+      "feature": "GarageCars",
+      "importance": 0.018471002811163966,
+      "raw_importance": 0.018471002811163966
+    },
+    {
+      "feature": "FullBath",
+      "importance": 0.01819113818032538,
+      "raw_importance": 0.01819113818032538
+    },
+    {
+      "feature": "YearRemodAdd",
+      "importance": 0.017821638445686364,
+      "raw_importance": 0.017821638445686364
+    },
+    {
+      "feature": "Neighborhood",
+      "importance": 0.013957465423776634,
+      "raw_importance": 0.013957465423776634
+    },
+    {
+      "feature": "Fireplaces",
+      "importance": 0.0069535263939066935,
+      "raw_importance": 0.0069535263939066935
+    },
+    {
+      "feature": "BedroomAbvGr",
+      "importance": 0.005829676624755017,
+      "raw_importance": 0.005829676624755017
+    },
+    {
+      "feature": "TotRmsAbvGrd",
+      "importance": 0.005374498867143997,
+      "raw_importance": 0.005374498867143997
+    }
+  ]
+}
