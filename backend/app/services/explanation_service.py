@@ -1,7 +1,11 @@
 import numpy as np
 import pandas as pd
 from typing import List, Dict, Any
-import shap
+try:
+    import shap
+    HAS_SHAP = True
+except ImportError:
+    HAS_SHAP = False
 
 from app.models.schemas import HouseFeatures, FeatureContribution, ExplanationResponse
 from app.models.model_loader import get_model, get_metadata
@@ -116,15 +120,18 @@ def get_local_explanation(model_name: str, features: HouseFeatures) -> Explanati
         scores = model.coef_ * raw_row_vals
         
     elif model_name == 'Random Forest':
-        try:
-            # Use SHAP values for Random Forest local explanation
-            explainer = shap.TreeExplainer(model)
-            shap_values = explainer.shap_values(df_preproc)
-            # shap_values shape is (1, n_features)
-            scores = shap_values[0].tolist()
-            baseline_price = float(explainer.expected_value[0])
-        except Exception as e:
-            print(f"SHAP explanation failed, falling back: {e}")
+        scores = []
+        if HAS_SHAP:
+            try:
+                explainer = shap.TreeExplainer(model)
+                shap_values = explainer.shap_values(df_preproc)
+                scores = shap_values[0].tolist()
+                baseline_price = float(explainer.expected_value[0])
+            except Exception as e:
+                print(f"SHAP explanation failed, falling back: {e}")
+                scores = []
+        
+        if not scores:
             # Fallback baseline
             baseline_price = 180921.0 * 83.0
             # Distribute prediction difference proportionally to RF feature importances as a fallback explanation
