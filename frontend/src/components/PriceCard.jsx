@@ -1,31 +1,35 @@
 import React from 'react';
-import { Home } from 'lucide-react';
+import { Home, Sparkles, TrendingUp, ShieldCheck } from 'lucide-react';
 
 const PriceCard = ({ prediction }) => {
   if (!prediction) return null;
 
   const { predicted_price, formatted_price, formatted_lakhs, model_name, baseline_price } = prediction;
 
-  // Simple formatting for baseline
   const formattedBaseline = baseline_price >= 100000 
     ? `₹${(baseline_price / 100000).toFixed(2)} Lakhs`
     : `₹${Math.round(baseline_price).toLocaleString()}`;
 
+  // Estimate USD valuation for global perspective (approx rate ~ 83 INR/USD)
+  const usdValue = Math.round(predicted_price / 83.3).toLocaleString();
+
   return (
-    <div className="price-display">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
-        <Home size={18} />
-        <span style={{ fontSize: '0.9rem', fontWeight: 600, uppercase: 'true' }}>Predicted Property Estimate</span>
+    <div className="price-display animate-fade-in">
+      <div className="price-label">
+        <Sparkles size={16} />
+        Estimated Market Valuation
       </div>
-      <div className="price-val">{formatted_lakhs}</div>
-      <div className="price-subval">Full Valuation: {formatted_price}</div>
       
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div className="price-val">{formatted_lakhs}</div>
+      <div className="price-subval">Full Currency Estimate: {formatted_price} • (${usdValue} USD)</div>
+      
+      <div className="price-meta-group">
         <span className="price-meta">
+          <ShieldCheck size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
           Model: {model_name}
         </span>
-        <span className="price-meta" style={{ backgroundColor: '#f1f5f9', color: '#4b5563' }}>
-          Baseline Intercept: {formattedBaseline}
+        <span className="price-meta" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)', borderColor: 'var(--color-border)' }}>
+          Base Market Average: {formattedBaseline}
         </span>
       </div>
     </div>

@@ -3,7 +3,7 @@ import PredictionForm from '../components/PredictionForm';
 import PriceCard from '../components/PriceCard';
 import PredictionHistory from '../components/PredictionHistory';
 import { predictPrice } from '../services/api';
-import { AlertCircle, HelpCircle } from 'lucide-react';
+import { AlertCircle, HelpCircle, ArrowRight, RefreshCw } from 'lucide-react';
 
 const Predict = ({
   selectedModel,
@@ -28,26 +28,24 @@ const Predict = ({
       setLastPrediction(pred);
       setLastFeatures(formData);
       
-      // Save to session history
       const newHistoryItem = {
         features: formData,
         predictedPrice: pred.predicted_price,
         priceFormatted: pred.formatted_price,
         priceLakhs: pred.formatted_lakhs,
         modelName: selectedModel,
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setHistory((prev) => [newHistoryItem, ...prev]);
     } catch (err) {
       console.error(err);
-      setError('Prediction request failed. Ensure the backend server is running and models are trained.');
+      setError('Prediction request failed. Please ensure the backend server is running.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleLoadHistory = (item) => {
-    // Reload into current form state and last prediction
     setLastFeatures(item.features);
     setSelectedModel(item.modelName);
     const mockPrediction = {
@@ -55,17 +53,17 @@ const Predict = ({
       formatted_price: item.priceFormatted,
       formatted_lakhs: item.priceLakhs,
       model_name: item.modelName,
-      baseline_price: item.predictedPrice - 100000 // approximation
+      baseline_price: item.predictedPrice - 100000
     };
     setLastPrediction(mockPrediction);
   };
 
   return (
-    <div>
+    <div className="animate-fade-in">
       <div className="page-header">
-        <h1 className="page-title">Predict House Price</h1>
+        <h1 className="page-title">House Price Valuation Tool</h1>
         <p className="page-subtitle">
-          Fill in the property details below and select a machine learning model to estimate the market valuation.
+          Customize property characteristics below to estimate current market valuation using trained machine learning models.
         </p>
       </div>
 
@@ -85,41 +83,42 @@ const Predict = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {loading && (
-            <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
-              <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-academic)' }}>
-                Executing model inference...
+            <div className="card" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+              <RefreshCw size={32} className="animate-spin" style={{ color: 'var(--color-brand)', margin: '0 auto 1rem auto' }} />
+              <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                Running Valuation Inference...
               </div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-                Preprocessing input vectors and running predictions in backend.
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.4rem' }}>
+                Evaluating feature vectors with {selectedModel}.
               </p>
             </div>
           )}
 
           {error && (
             <div className="alert alert-warning" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <AlertCircle size={16} />
+              <AlertCircle size={18} />
               {error}
             </div>
           )}
 
           {!loading && lastPrediction && (
-            <div style={{ animation: 'fadeIn 0.3s ease-in-out' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <PriceCard prediction={lastPrediction} />
               
-              <div className="card" style={{ textAlign: 'center', border: '1px solid #bfdbfe', backgroundColor: '#eff6ff' }}>
-                <h4 style={{ color: 'var(--color-academic)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <div className="card" style={{ textAlign: 'center', backgroundColor: 'var(--color-brand-light)', borderColor: 'var(--color-brand-border)' }}>
+                <h4 style={{ color: 'var(--color-brand-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
                   <HelpCircle size={18} />
-                  Why did the model predict this price?
+                  Why did the model predict this valuation?
                 </h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                  This prediction is based on the combined contributions of 15 features. Explore the exact positive/negative factors.
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '1.1rem' }}>
+                  Explore individual feature contributions, price boosters, and price reducers.
                 </p>
                 <button
                   onClick={() => setCurrentPage('explain')}
                   className="btn btn-primary"
                   style={{ width: '100%' }}
                 >
-                  View Local Explanation Detail
+                  View Full Price Breakdown <ArrowRight size={16} />
                 </button>
               </div>
             </div>

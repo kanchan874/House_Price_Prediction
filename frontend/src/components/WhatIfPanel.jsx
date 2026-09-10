@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { runWhatIf } from '../services/api';
-import { PlayCircle, AlertCircle, ArrowRightLeft } from 'lucide-react';
+import { ArrowRightLeft, Sparkles, PlayCircle, AlertCircle, RefreshCw } from 'lucide-react';
 
 const DISPLAY_NAME_MAPPING = {
-  OverallQual: 'Overall Quality',
-  GrLivArea: 'Living Area (sq ft)',
+  OverallQual: 'Overall Quality Grade',
+  GrLivArea: 'Living Area Space (sq ft)',
   YearBuilt: 'Year Built',
   TotalBsmtSF: 'Basement Area (sq ft)',
   GarageCars: 'Garage Size (Cars)',
   FullBath: 'Bathrooms',
   BedroomAbvGr: 'Bedrooms',
-  Neighborhood: 'Neighborhood'
+  Neighborhood: 'Neighborhood Location'
 };
 
 const WhatIfPanel = ({ originalFeatures, selectedModel, metadata }) => {
@@ -19,7 +19,6 @@ const WhatIfPanel = ({ originalFeatures, selectedModel, metadata }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Initialize modified features from original features
   useEffect(() => {
     if (originalFeatures) {
       setModifiedFeatures({ ...originalFeatures });
@@ -30,10 +29,13 @@ const WhatIfPanel = ({ originalFeatures, selectedModel, metadata }) => {
 
   if (!originalFeatures || !modifiedFeatures) {
     return (
-      <div className="card">
-        <div className="card-title">What-If Simulation Panel</div>
-        <div className="alert alert-info">
-          Please run an initial house price prediction first on the Predict page to set up a baseline.
+      <div className="card animate-fade-in">
+        <div className="card-title">
+          <ArrowRightLeft size={20} style={{ color: 'var(--color-brand)' }} />
+          Interactive Renovation & What-If Simulator
+        </div>
+        <div className="alert alert-info" style={{ margin: 0 }}>
+          💡 Please calculate an initial house valuation on the <strong>Valuation Tool</strong> tab first to set up a baseline home to simulate against.
         </div>
       </div>
     );
@@ -42,13 +44,10 @@ const WhatIfPanel = ({ originalFeatures, selectedModel, metadata }) => {
   const handleSliderChange = (name, val) => {
     setModifiedFeatures((prev) => {
       const updated = { ...prev, [name]: val };
-      
-      // Keep floor details synced if Living Area is modified
       if (name === 'GrLivArea') {
         updated['1stFlrSF'] = Math.round(val * 0.6);
         updated['2ndFlrSF'] = Math.round(val * 0.4);
       }
-      
       return updated;
     });
   };
@@ -61,7 +60,7 @@ const WhatIfPanel = ({ originalFeatures, selectedModel, metadata }) => {
       setResult(data);
     } catch (err) {
       console.error(err);
-      setError('Failed to compute simulated prediction. Please verify inputs.');
+      setError('Failed to calculate simulated prediction. Please verify inputs.');
     } finally {
       setLoading(false);
     }
@@ -73,137 +72,111 @@ const WhatIfPanel = ({ originalFeatures, selectedModel, metadata }) => {
   ];
 
   return (
-    <div className="card">
-      <div className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <ArrowRightLeft size={20} />
-        Interactive What-If Simulation
+    <div className="card animate-fade-in">
+      <div className="card-title">
+        <ArrowRightLeft size={20} style={{ color: 'var(--color-brand)' }} />
+        Renovation & What-If Price Simulator
       </div>
-      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-        Simulate how changing individual characteristics modifies the predicted price. Changes are recalculated instantly using the backend API.
+      <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+        Simulate how adding living area, upgrading finish quality, or adding garage space alters market valuation.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }}>
-        {/* Sliders and Selects Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        
+        {/* Sliders & Input Column */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.35rem' }}>
           
-          {/* Overall Quality */}
+          {/* Quality Slider */}
           <div className="form-group">
-            <label className="form-label">
+            <div className="form-label">
               <span>{DISPLAY_NAME_MAPPING.OverallQual}</span>
-              <span className="slider-val">{modifiedFeatures.OverallQual} / 10</span>
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="10"
-              className="slider-input"
-              value={modifiedFeatures.OverallQual}
-              onChange={(e) => handleSliderChange('OverallQual', Number(e.target.value))}
-            />
+              <span className="slider-val">Grade {modifiedFeatures.OverallQual} / 10</span>
+            </div>
+            <div className="slider-container" style={{ marginTop: '0.4rem' }}>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                className="slider-input"
+                value={modifiedFeatures.OverallQual}
+                onChange={(e) => handleSliderChange('OverallQual', Number(e.target.value))}
+              />
+            </div>
           </div>
 
-          {/* Living Area */}
+          {/* Living Area Slider */}
           <div className="form-group">
-            <label className="form-label">
+            <div className="form-label">
               <span>{DISPLAY_NAME_MAPPING.GrLivArea}</span>
               <span className="slider-val">{modifiedFeatures.GrLivArea} sq ft</span>
-            </label>
-            <input
-              type="range"
-              min={Math.max(500, (metadata?.GrLivArea?.min || 500))}
-              max={Math.min(4000, (metadata?.GrLivArea?.max || 4000))}
-              step="50"
-              className="slider-input"
-              value={modifiedFeatures.GrLivArea}
-              onChange={(e) => handleSliderChange('GrLivArea', Number(e.target.value))}
-            />
+            </div>
+            <div className="slider-container" style={{ marginTop: '0.4rem' }}>
+              <input
+                type="range"
+                min="600"
+                max="4000"
+                step="50"
+                className="slider-input"
+                value={modifiedFeatures.GrLivArea}
+                onChange={(e) => handleSliderChange('GrLivArea', Number(e.target.value))}
+              />
+            </div>
           </div>
 
           {/* Garage Cars */}
           <div className="form-group">
-            <label className="form-label">
-              <span>{DISPLAY_NAME_MAPPING.GarageCars}</span>
-              <span className="slider-val">{modifiedFeatures.GarageCars} Car(s)</span>
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="4"
-              className="slider-input"
-              value={modifiedFeatures.GarageCars}
-              onChange={(e) => handleSliderChange('GarageCars', Number(e.target.value))}
-            />
+            <label className="form-label">{DISPLAY_NAME_MAPPING.GarageCars}</label>
+            <div className="pill-group" style={{ marginTop: '0.35rem' }}>
+              {[0, 1, 2, 3, 4].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={`pill-btn ${modifiedFeatures.GarageCars === n ? 'active' : ''}`}
+                  onClick={() => handleSliderChange('GarageCars', n)}
+                >
+                  {n === 0 ? 'No Garage' : `${n} Car`}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Year Built */}
-          <div className="form-group">
-            <label className="form-label">
-              <span>{DISPLAY_NAME_MAPPING.YearBuilt}</span>
-              <span className="slider-val">{modifiedFeatures.YearBuilt}</span>
-            </label>
-            <input
-              type="range"
-              min={metadata?.YearBuilt?.min || 1900}
-              max={2010}
-              className="slider-input"
-              value={modifiedFeatures.YearBuilt}
-              onChange={(e) => handleSliderChange('YearBuilt', Number(e.target.value))}
-            />
-          </div>
-
-          {/* Basement Area */}
-          <div className="form-group">
-            <label className="form-label">
-              <span>{DISPLAY_NAME_MAPPING.TotalBsmtSF}</span>
-              <span className="slider-val">{modifiedFeatures.TotalBsmtSF} sq ft</span>
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="2000"
-              step="50"
-              className="slider-input"
-              value={modifiedFeatures.TotalBsmtSF}
-              onChange={(e) => handleSliderChange('TotalBsmtSF', Number(e.target.value))}
-            />
-          </div>
-
-          {/* Bedrooms / Bathrooms side-by-side */}
+          {/* Bedrooms / Bathrooms side by side */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="form-group">
-              <label className="form-label">{DISPLAY_NAME_MAPPING.BedroomAbvGr}</label>
+              <label className="form-label">Bedrooms</label>
               <select
                 className="form-control"
                 value={modifiedFeatures.BedroomAbvGr}
                 onChange={(e) => handleSliderChange('BedroomAbvGr', Number(e.target.value))}
               >
-                {[0, 1, 2, 3, 4, 5, 6].map((n) => (
-                  <option key={n} value={n}>{n}</option>
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <option key={n} value={n}>{n} Bed</option>
                 ))}
               </select>
             </div>
             
             <div className="form-group">
-              <label className="form-label">{DISPLAY_NAME_MAPPING.FullBath}</label>
+              <label className="form-label">Bathrooms</label>
               <select
                 className="form-control"
                 value={modifiedFeatures.FullBath}
                 onChange={(e) => handleSliderChange('FullBath', Number(e.target.value))}
               >
-                {[0, 1, 2, 3, 4].map((n) => (
-                  <option key={n} value={n}>{n}</option>
+                {[1, 2, 3, 4].map((n) => (
+                  <option key={n} value={n}>{n} Bath</option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* Neighborhood dropdown */}
+          {/* Neighborhood Selector */}
           <div className="form-group">
             <label className="form-label">{DISPLAY_NAME_MAPPING.Neighborhood}</label>
             <select
               className="form-control"
               value={modifiedFeatures.Neighborhood}
               onChange={(e) => handleSliderChange('Neighborhood', e.target.value)}
+              style={{ fontWeight: 600 }}
             >
               {neighborhoods.map((nb) => (
                 <option key={nb} value={nb}>{nb}</option>
@@ -216,14 +189,14 @@ const WhatIfPanel = ({ originalFeatures, selectedModel, metadata }) => {
             className="btn btn-primary"
             onClick={executeSimulation}
             disabled={loading}
-            style={{ width: '100%', marginTop: '0.5rem', display: 'flex', gap: '0.5rem' }}
+            style={{ width: '100%', padding: '0.85rem 1.5rem', fontSize: '1rem', marginTop: '0.5rem' }}
           >
-            <PlayCircle size={18} />
-            {loading ? 'Simulating...' : 'Recalculate Prediction'}
+            {loading ? <RefreshCw size={18} className="animate-spin" /> : <PlayCircle size={18} />}
+            {loading ? 'Recalculating Valuation...' : 'Calculate Simulated Price'}
           </button>
         </div>
 
-        {/* Results Comparison Column */}
+        {/* Results Comparison Block */}
         {error && (
           <div className="alert alert-warning" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <AlertCircle size={16} />
@@ -234,42 +207,39 @@ const WhatIfPanel = ({ originalFeatures, selectedModel, metadata }) => {
         {result && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', borderTop: '1px solid var(--color-border)', paddingTop: '1.5rem' }}>
             <div className="what-if-split">
-              {/* Original Card */}
+              {/* Baseline Card */}
               <div className="compare-block original">
-                <span className="compare-label">Original Prediction</span>
+                <span className="compare-label">Baseline House Price</span>
                 <span className="compare-price">{result.original_formatted_lakhs}</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                  ({result.original_formatted})
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                  {result.original_formatted}
                 </span>
               </div>
               
-              {/* Modified Card */}
+              {/* Simulated Card */}
               <div className="compare-block modified">
-                <span className="compare-label">Simulated Prediction</span>
+                <span className="compare-label" style={{ color: 'var(--color-brand)' }}>Simulated House Price</span>
                 <span className="compare-price">{result.modified_formatted_lakhs}</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                  ({result.modified_formatted})
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                  {result.modified_formatted}
                 </span>
               </div>
             </div>
 
-            {/* Difference Block */}
+            {/* Difference Callout */}
             <div className={`diff-callout ${result.direction}`}>
-              <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
-                Net Simulated Effect
+              <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>
+                Net Market Value Shift
               </div>
-              <div style={{ fontSize: '1.5rem' }}>
+              <div style={{ fontSize: '1.6rem', fontFamily: 'var(--font-heading)' }}>
                 {result.direction === 'increase' ? '+' : ''}
                 {result.formatted_difference} ({result.direction === 'increase' ? '+' : ''}
                 {result.percentage_difference.toFixed(2)}%)
               </div>
             </div>
-            
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'center', fontStyle: 'italic' }}>
-              * Calculated by changing features from baseline state and executing {selectedModel} in the backend.
-            </p>
           </div>
         )}
+
       </div>
     </div>
   );

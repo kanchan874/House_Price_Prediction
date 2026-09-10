@@ -5,51 +5,46 @@ const PredictionHistory = ({ history, onLoadHistory }) => {
   if (!history || history.length === 0) {
     return (
       <div className="card">
-        <div className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <History size={18} />
-          Prediction History
+        <div className="card-title">
+          <History size={18} style={{ color: 'var(--color-brand)' }} />
+          Session History
         </div>
         <div style={{ padding: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
-          No predictions performed in this session.
+          No valuations performed in this session yet.
         </div>
       </div>
     );
   }
 
   return (
-    <div className="card" style={{ padding: '1rem' }}>
-      <div className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.25rem' }}>
-        <History size={18} />
-        Prediction History ({history.length})
+    <div className="card">
+      <div className="card-title">
+        <History size={18} style={{ color: 'var(--color-brand)' }} />
+        Recent Valuations ({history.length})
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '250px', overflowY: 'auto' }}>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '280px', overflowY: 'auto' }}>
         {history.map((item, idx) => (
           <div key={idx} className="history-item">
             <div>
-              <div style={{ fontWeight: 'bold', color: 'var(--color-academic)' }}>
+              <div style={{ fontWeight: 800, color: 'var(--color-brand-dark)', fontSize: '1rem' }}>
                 {item.priceLakhs}
               </div>
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>
-                {item.features.GrLivArea} sq ft, {item.features.BedroomAbvGr}BHK in {item.features.Neighborhood}
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.1rem' }}>
+                {item.features.GrLivArea} sq ft • {item.features.BedroomAbvGr} Bed in {item.features.Neighborhood}
               </div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>
-                Model: {item.modelName}
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-light)', marginTop: '0.1rem' }}>
+                Model: {item.modelName} ({item.timestamp})
               </div>
             </div>
+            
             <button
               onClick={() => onLoadHistory(item)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--color-accent)',
-                cursor: 'pointer',
-                padding: '0.25rem',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-              title="Reload this property details"
+              className="btn btn-secondary"
+              style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
+              title="Reload parameters"
             >
-              <ArrowRight size={14} />
+              Load <ArrowRight size={14} />
             </button>
           </div>
         ))}

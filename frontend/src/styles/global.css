@@ -1,30 +1,44 @@
-/* Global Design Tokens & Resets for Academic Look */
+/* Modern Humanized Real-Estate Valuation Design System */
 :root {
-  --bg-primary: #fcfdfd;
-  --bg-secondary: #f3f4f6;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
   --bg-card: #ffffff;
+  --bg-card-hover: #fafafa;
   
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-light: #9ca3af;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-light: #94a3b8;
   
-  --color-academic: #1e3a8a; /* Academic Dark Blue */
-  --color-accent: #2563eb;
-  --color-border: #e5e7eb;
+  --color-brand: #2563eb;
+  --color-brand-dark: #1d4ed8;
+  --color-brand-light: #eff6ff;
+  --color-brand-border: #bfdbfe;
   
-  --color-positive: #059669; /* Emerald Green */
+  --color-border: #e2e8f0;
+  --color-border-hover: #cbd5e1;
+  
+  --color-positive: #10b981;
   --color-positive-bg: #ecfdf5;
-  --color-negative: #dc2626; /* Crimson Red */
-  --color-negative-bg: #fef2f2;
+  --color-positive-border: #a7f3d0;
   
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-serif: 'Georgia', 'Times New Roman', Times, serif; /* Editorial Academic Feel */
+  --color-negative: #f43f5e;
+  --color-negative-bg: #fff1f2;
+  --color-negative-border: #fecdd3;
   
-  --border-radius: 4px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   
-  --max-width: 1200px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  --shadow-brand: 0 8px 20px -4px rgba(37, 99, 235, 0.25);
+  
+  --max-width: 1240px;
 }
 
 * {
@@ -40,40 +54,75 @@ body {
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--color-brand);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 a:hover {
-  text-decoration: underline;
+  color: var(--color-brand-dark);
 }
 
 .container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 2.5rem 1.5rem;
 }
 
 /* Card Styling */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1.75rem;
+  margin-bottom: 1.75rem;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .card-title {
-  font-family: var(--font-serif);
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--color-academic);
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Page Headers */
+.page-header {
+  margin-bottom: 2.25rem;
+  text-align: left;
+}
+
+.page-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  max-width: 800px;
 }
 
 /* Button Styling */
@@ -81,78 +130,109 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1.25rem;
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  font-weight: 500;
-  border-radius: var(--border-radius);
+  gap: 0.5rem;
+  padding: 0.65rem 1.35rem;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
 }
 
 .btn-primary {
-  background-color: var(--color-academic);
+  background: linear-gradient(135deg, var(--color-brand), var(--color-brand-dark));
   color: #ffffff;
+  box-shadow: var(--shadow-brand);
 }
+
 .btn-primary:hover {
-  background-color: #172554;
-  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px -4px rgba(37, 99, 235, 0.35);
+  color: #ffffff;
 }
 
 .btn-secondary {
-  background-color: transparent;
-  border-color: var(--color-academic);
-  color: var(--color-academic);
+  background-color: var(--bg-card);
+  border-color: var(--color-border);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
 }
+
 .btn-secondary:hover {
-  background-color: #f0f4fe;
-  text-decoration: none;
+  background-color: var(--bg-secondary);
+  border-color: var(--color-border-hover);
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
-/* Page Headers */
-.page-header {
-  margin-bottom: 2rem;
-  border-bottom: 2px solid var(--color-academic);
-  padding-bottom: 1rem;
+/* Pill Selectors */
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.page-title {
-  font-family: var(--font-serif);
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--color-academic);
-}
-
-.page-subtitle {
-  font-size: 1.1rem;
+.pill-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background-color: var(--bg-card);
   color: var(--text-secondary);
-  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-/* Alerts / Callouts */
+.pill-btn:hover {
+  border-color: var(--color-brand-border);
+  color: var(--color-brand);
+  background-color: var(--color-brand-light);
+}
+
+.pill-btn.active {
+  background-color: var(--color-brand);
+  color: #ffffff;
+  border-color: var(--color-brand);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+/* Alerts */
 .alert {
-  padding: 1rem;
-  border-radius: var(--border-radius);
+  padding: 1.15rem 1.25rem;
+  border-radius: var(--radius-md);
   border-left: 4px solid transparent;
   margin-bottom: 1.5rem;
   font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .alert-info {
-  background-color: #eff6ff;
-  border-left-color: var(--color-accent);
+  background-color: var(--color-brand-light);
+  border-left-color: var(--color-brand);
   color: #1e40af;
 }
 
 .alert-warning {
   background-color: #fffbeb;
-  border-left-color: #d97706;
+  border-left-color: #f59e0b;
   color: #92400e;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
 }

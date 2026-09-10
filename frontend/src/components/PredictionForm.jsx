@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { getFeatureMetadata } from '../services/api';
+import { Home, Layers, Sparkles, Building2, MapPin, Award, CheckCircle2 } from 'lucide-react';
 
 const PredictionForm = ({ onSubmit, selectedModel, setSelectedModel, modelMetrics, initialValues }) => {
   const [metadata, setMetadata] = useState(null);
   const [loadingMetadata, setLoadingMetadata] = useState(true);
   const [formData, setFormData] = useState({
-    OverallQual: 6,
-    GrLivArea: 1500,
-    YearBuilt: 2000,
-    YearRemodAdd: 2000,
-    TotalBsmtSF: 800,
+    OverallQual: 7,
+    GrLivArea: 1800,
+    YearBuilt: 2005,
+    YearRemodAdd: 2006,
+    TotalBsmtSF: 850,
     GarageCars: 2,
-    GarageArea: 400,
+    GarageArea: 440,
     FullBath: 2,
     BedroomAbvGr: 3,
-    TotRmsAbvGrd: 6,
+    TotRmsAbvGrd: 7,
     Fireplaces: 1,
-    '1stFlrSF': 900,
-    '2ndFlrSF': 600,
-    LotArea: 8000,
+    '1stFlrSF': 1080,
+    '2ndFlrSF': 720,
+    LotArea: 9000,
     Neighborhood: 'CollgCr'
   });
 
@@ -27,12 +28,13 @@ const PredictionForm = ({ onSubmit, selectedModel, setSelectedModel, modelMetric
       try {
         const data = await getFeatureMetadata();
         setMetadata(data);
-        // Set defaults from metadata if available
-        const defaults = {};
-        Object.keys(data).forEach((key) => {
-          defaults[key] = data[key].default;
-        });
-        setFormData(defaults);
+        if (!initialValues) {
+          const defaults = {};
+          Object.keys(data).forEach((key) => {
+            defaults[key] = data[key].default;
+          });
+          setFormData(defaults);
+        }
       } catch (error) {
         console.error('Error fetching metadata:', error);
       } finally {
@@ -40,48 +42,41 @@ const PredictionForm = ({ onSubmit, selectedModel, setSelectedModel, modelMetric
       }
     }
     fetchMetadata();
-  }, []);
+  }, [initialValues]);
 
-  // Update initial values if passed (e.g., from explanation page or what-if)
   useEffect(() => {
     if (initialValues) {
       setFormData(initialValues);
     }
   }, [initialValues]);
 
-  const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    let val = value;
-    
-    if (type === 'number') {
-      val = value === '' ? '' : Number(value);
-    }
-
+  const handleChange = (name, val) => {
     setFormData((prev) => {
       const updated = { ...prev, [name]: val };
       
-      // Auto-compute logic: if GrLivArea is changed, sync 1stFlrSF and 2ndFlrSF proportionally
+      // Auto-compute logic: sync floor area ratios if GrLivArea is changed
       if (name === 'GrLivArea' && typeof val === 'number') {
         updated['1stFlrSF'] = Math.round(val * 0.6);
         updated['2ndFlrSF'] = Math.round(val * 0.4);
-        // Sync total rooms above grade to a reasonable ratio if it's too small
         if (updated.TotRmsAbvGrd < Math.ceil(val / 300)) {
           updated.TotRmsAbvGrd = Math.max(4, Math.ceil(val / 250));
         }
       }
       
-      // Auto-compute logic: if YearBuilt is changed, sync YearRemodAdd to be >= YearBuilt
+      // Sync YearRemodAdd to be >= YearBuilt
       if (name === 'YearBuilt' && typeof val === 'number') {
         if (updated.YearRemodAdd < val) {
           updated.YearRemodAdd = val;
         }
       }
 
-      // Auto-compute logic: if GarageCars is set to 0, set GarageArea to 0
-      if (name === 'GarageCars' && val === 0) {
-        updated.GarageArea = 0;
-      } else if (name === 'GarageCars' && val > 0 && prev.GarageCars === 0 && prev.GarageArea === 0) {
-        updated.GarageArea = val * 200; // rough guess
+      // Sync GarageArea when GarageCars changes
+      if (name === 'GarageCars') {
+        if (val === 0) {
+          updated.GarageArea = 0;
+        } else if (prev.GarageCars === 0 || prev.GarageArea === 0) {
+          updated.GarageArea = val * 220;
+        }
       }
 
       return updated;
@@ -90,308 +85,276 @@ const PredictionForm = ({ onSubmit, selectedModel, setSelectedModel, modelMetric
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Validate bounds
-    if (metadata) {
-      for (const [key, meta] of Object.entries(metadata)) {
-        if (meta.type === 'numeric') {
-          const val = formData[key];
-          if (val < meta.min || val > meta.max) {
-            alert(`Warning: '${key}' value (${val}) is outside training range [${meta.min}, ${meta.max}]. Model prediction accuracy may be reduced.`);
-          }
-        }
-      }
-    }
     onSubmit(formData);
   };
 
-  // Neighborhood categories fallback
   const neighborhoods = metadata?.Neighborhood?.categories || [
     'CollgCr', 'Veenker', 'Crawfor', 'NoRidge', 'Mitchel', 'Somerst', 'NWAmes', 'OldTown', 
     'BrkSide', 'Sawyer', 'NridgHt', 'NAmes', 'SawyerW', 'IDOTRR', 'MeadowV', 'Edwards', 
     'Timber', 'Gilbert', 'StoneBr', 'ClearCr', 'NPkVill', 'Blmngtn', 'BrDale', 'SWISU', 'Blueste'
   ];
 
-  const models = ['Explainable Boosting Machine', 'Linear Regression', 'Random Forest'];
+  const models = [
+    { name: 'Explainable Boosting Machine', tag: 'Recommended', desc: 'Highest interpretability & accuracy' },
+    { name: 'Random Forest', tag: 'High Precision', desc: 'Ensemble model with SHAP analysis' },
+    { name: 'Linear Regression', tag: 'Fast Baseline', desc: 'Classic linear coefficients' }
+  ];
+
+  const getQualityLabel = (score) => {
+    if (score >= 9) return 'Luxury / High End';
+    if (score >= 7) return 'Above Average / Excellent';
+    if (score >= 5) return 'Standard / Good Condition';
+    if (score >= 3) return 'Below Average / Needs Repair';
+    return 'Fair / Fixer Upper';
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="card">
-      <div className="card-title">House Details Input Form</div>
+    <form onSubmit={handleSubmit} className="card animate-fade-in">
+      <div className="card-title">
+        <Sparkles size={20} style={{ color: 'var(--color-brand)' }} />
+        Property Details & Valuation Inputs
+      </div>
       
-      {/* Model Selection Row */}
-      <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-        <label className="form-label" htmlFor="model_select">
-          Select Prediction Model
+      {/* Model Selection Option Cards */}
+      <div style={{ marginBottom: '2rem' }}>
+        <label className="form-label" style={{ marginBottom: '0.75rem' }}>
+          Select Prediction Model Architecture
         </label>
-        <select
-          id="model_select"
-          className="form-control"
-          value={selectedModel}
-          onChange={(e) => setSelectedModel(e.target.value)}
-          style={{ border: '2px solid var(--color-academic)', fontWeight: 'bold' }}
-        >
-          {models.map((m) => (
-            <option key={m} value={m}>
-              {m} {modelMetrics?.[m] ? `(R²: ${modelMetrics[m].R2.toFixed(3)})` : ''}
-            </option>
-          ))}
-        </select>
-        <span className="form-helper">
-          * Note: EBM represents the best trade-off of accuracy and pure feature-level interpretability.
-        </span>
+        <div className="option-cards-grid">
+          {models.map((m) => {
+            const isSelected = selectedModel === m.name;
+            const r2Score = modelMetrics?.[m.name]?.R2 ? `(R² ${modelMetrics[m.name].R2.toFixed(3)})` : '';
+            return (
+              <div
+                key={m.name}
+                className={`option-card ${isSelected ? 'selected' : ''}`}
+                onClick={() => setSelectedModel(m.name)}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="option-card-title" style={{ fontSize: '0.9rem' }}>{m.name}</span>
+                  {isSelected && <CheckCircle2 size={16} style={{ color: 'var(--color-brand)' }} />}
+                </div>
+                <div className="option-card-subtitle">
+                  <span style={{ fontWeight: 600, color: 'var(--color-brand)' }}>{m.tag}</span> {r2Score}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Group 1: Property Details */}
-      <div className="form-section-title">Property Size & Rooms</div>
+      {/* Section 1: Space & Living Area */}
+      <div className="form-section-title">
+        <Home size={18} style={{ color: 'var(--color-brand)' }} />
+        1. Living Space & Rooms
+      </div>
+      
       <div className="form-grid">
-        <div className="form-group">
-          <label className="form-label">
-            Living Area (sq ft)
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              [{metadata?.GrLivArea?.min || 334} - {metadata?.GrLivArea?.max || 5642}]
-            </span>
-          </label>
-          <input
-            type="number"
-            name="GrLivArea"
-            className="form-control"
-            value={formData.GrLivArea}
-            onChange={handleChange}
-            required
-            min="100"
-          />
+        {/* Living Area with Slider & Input */}
+        <div className="form-group" style={{ gridColumn: 'span 1' }}>
+          <div className="form-label">
+            <span>Living Area (sq ft)</span>
+            <span className="slider-val">{formData.GrLivArea} sq ft</span>
+          </div>
+          <div className="slider-container" style={{ marginTop: '0.5rem' }}>
+            <input
+              type="range"
+              min="500"
+              max="4500"
+              step="50"
+              className="slider-input"
+              value={formData.GrLivArea}
+              onChange={(e) => handleChange('GrLivArea', Number(e.target.value))}
+            />
+            <input
+              type="number"
+              className="form-control"
+              style={{ width: '90px', padding: '0.35rem 0.5rem', textAlign: 'center' }}
+              value={formData.GrLivArea}
+              onChange={(e) => handleChange('GrLivArea', Number(e.target.value))}
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label">
-            Lot Area (sq ft)
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              [{metadata?.LotArea?.min || 1300} - {metadata?.LotArea?.max || 215245}]
-            </span>
-          </label>
-          <input
-            type="number"
-            name="LotArea"
-            className="form-control"
-            value={formData.LotArea}
-            onChange={handleChange}
-            required
-            min="100"
-          />
-        </div>
-
+        {/* Bedrooms Pill Selector */}
         <div className="form-group">
           <label className="form-label">Bedrooms (Above Grade)</label>
-          <select
-            name="BedroomAbvGr"
-            className="form-control"
-            value={formData.BedroomAbvGr}
-            onChange={handleChange}
-          >
-            {[0, 1, 2, 3, 4, 5, 6, 8].map((n) => (
-              <option key={n} value={n}>{n} Bedroom{n !== 1 ? 's' : ''}</option>
+          <div className="pill-group" style={{ marginTop: '0.4rem' }}>
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <button
+                key={n}
+                type="button"
+                className={`pill-btn ${formData.BedroomAbvGr === n ? 'active' : ''}`}
+                onClick={() => handleChange('BedroomAbvGr', n)}
+              >
+                {n} {n === 6 ? '+' : ''} Bed
+              </button>
             ))}
-          </select>
+          </div>
         </div>
 
+        {/* Bathrooms Pill Selector */}
         <div className="form-group">
           <label className="form-label">Bathrooms (Full)</label>
-          <select
-            name="FullBath"
-            className="form-control"
-            value={formData.FullBath}
-            onChange={handleChange}
-          >
-            {[0, 1, 2, 3, 4].map((n) => (
-              <option key={n} value={n}>{n} Full Bath{n !== 1 ? 's' : ''}</option>
+          <div className="pill-group" style={{ marginTop: '0.4rem' }}>
+            {[1, 2, 3, 4].map((n) => (
+              <button
+                key={n}
+                type="button"
+                className={`pill-btn ${formData.FullBath === n ? 'active' : ''}`}
+                onClick={() => handleChange('FullBath', n)}
+              >
+                {n} Bath
+              </button>
             ))}
-          </select>
+          </div>
         </div>
 
+        {/* Total Lot Area */}
         <div className="form-group">
-          <label className="form-label">Total Rooms (Above Grade)</label>
+          <label className="form-label">Lot Area (sq ft)</label>
           <input
             type="number"
-            name="TotRmsAbvGrd"
             className="form-control"
-            value={formData.TotRmsAbvGrd}
-            onChange={handleChange}
+            value={formData.LotArea}
+            onChange={(e) => handleChange('LotArea', Number(e.target.value))}
+            min="1000"
+            max="100000"
             required
-            min="2"
-            max="20"
           />
         </div>
       </div>
 
-      {/* Group 2: Construction */}
-      <div className="form-section-title">Age & Quality</div>
+      {/* Section 2: Quality & Construction Age */}
+      <div className="form-section-title">
+        <Award size={18} style={{ color: 'var(--color-brand)' }} />
+        2. Property Quality & Age
+      </div>
+      
       <div className="form-grid">
-        <div className="form-group">
-          <label className="form-label">
-            Year Built
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              [{metadata?.YearBuilt?.min || 1872} - {metadata?.YearBuilt?.max || 2010}]
+        {/* Quality Rating Slider */}
+        <div className="form-group" style={{ gridColumn: 'span 2' }}>
+          <div className="form-label">
+            <span>Overall Material & Finish Quality (1 - 10)</span>
+            <span className="slider-val" style={{ width: 'auto', padding: '0.2rem 0.8rem' }}>
+              Grade {formData.OverallQual} • {getQualityLabel(formData.OverallQual)}
             </span>
-          </label>
+          </div>
+          <div className="slider-container" style={{ marginTop: '0.6rem' }}>
+            <input
+              type="range"
+              min="1"
+              max="10"
+              className="slider-input"
+              value={formData.OverallQual}
+              onChange={(e) => handleChange('OverallQual', Number(e.target.value))}
+            />
+          </div>
+        </div>
+
+        {/* Year Built */}
+        <div className="form-group">
+          <label className="form-label">Year Built</label>
           <input
             type="number"
-            name="YearBuilt"
             className="form-control"
             value={formData.YearBuilt}
-            onChange={handleChange}
-            required
-            min="1800"
+            onChange={(e) => handleChange('YearBuilt', Number(e.target.value))}
+            min="1880"
             max="2026"
+            required
           />
         </div>
 
+        {/* Year Remodeled */}
         <div className="form-group">
           <label className="form-label">Year Remodeled</label>
           <input
             type="number"
-            name="YearRemodAdd"
             className="form-control"
             value={formData.YearRemodAdd}
-            onChange={handleChange}
-            required
-            min="1800"
+            onChange={(e) => handleChange('YearRemodAdd', Number(e.target.value))}
+            min="1880"
             max="2026"
+            required
           />
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">
-            Overall Quality Rating
-          </label>
-          <select
-            name="OverallQual"
-            className="form-control"
-            value={formData.OverallQual}
-            onChange={handleChange}
-            style={{ fontWeight: 'bold' }}
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <option key={n} value={n}>{n} - {
-                n === 10 ? 'Very Excellent' :
-                n === 9 ? 'Excellent' :
-                n === 8 ? 'Very Good' :
-                n === 7 ? 'Good' :
-                n === 6 ? 'Above Average' :
-                n === 5 ? 'Average' :
-                n === 4 ? 'Below Average' :
-                n === 3 ? 'Fair' :
-                n === 2 ? 'Poor' : 'Very Poor'
-              }</option>
-            ))}
-          </select>
         </div>
       </div>
 
-      {/* Group 3: Basement & Garage */}
-      <div className="form-section-title">Basement, Garage & Fireplaces</div>
+      {/* Section 3: Basement & Garage Amenities */}
+      <div className="form-section-title">
+        <Building2 size={18} style={{ color: 'var(--color-brand)' }} />
+        3. Basement, Garage & Amenities
+      </div>
+
       <div className="form-grid">
         <div className="form-group">
           <label className="form-label">Basement Area (sq ft)</label>
           <input
             type="number"
-            name="TotalBsmtSF"
             className="form-control"
             value={formData.TotalBsmtSF}
-            onChange={handleChange}
-            required
+            onChange={(e) => handleChange('TotalBsmtSF', Number(e.target.value))}
             min="0"
+            max="3000"
           />
         </div>
 
         <div className="form-group">
-          <label className="form-label">Garage Capacity (Cars)</label>
-          <select
-            name="GarageCars"
-            className="form-control"
-            value={formData.GarageCars}
-            onChange={handleChange}
-          >
-            {[0, 1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>{n} Car{n !== 1 ? 's' : ''}</option>
+          <label className="form-label">Garage Capacity</label>
+          <div className="pill-group" style={{ marginTop: '0.4rem' }}>
+            {[0, 1, 2, 3, 4].map((n) => (
+              <button
+                key={n}
+                type="button"
+                className={`pill-btn ${formData.GarageCars === n ? 'active' : ''}`}
+                onClick={() => handleChange('GarageCars', n)}
+              >
+                {n === 0 ? 'No Garage' : `${n} Car`}
+              </button>
             ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Garage Area (sq ft)</label>
-          <input
-            type="number"
-            name="GarageArea"
-            className="form-control"
-            value={formData.GarageArea}
-            onChange={handleChange}
-            required
-            min="0"
-          />
+          </div>
         </div>
 
         <div className="form-group">
           <label className="form-label">Fireplaces</label>
-          <select
-            name="Fireplaces"
-            className="form-control"
-            value={formData.Fireplaces}
-            onChange={handleChange}
-          >
-            {[0, 1, 2, 3, 4].map((n) => (
-              <option key={n} value={n}>{n}</option>
+          <div className="pill-group" style={{ marginTop: '0.4rem' }}>
+            {[0, 1, 2, 3].map((n) => (
+              <button
+                key={n}
+                type="button"
+                className={`pill-btn ${formData.Fireplaces === n ? 'active' : ''}`}
+                onClick={() => handleChange('Fireplaces', n)}
+              >
+                {n === 0 ? 'None' : `${n}`}
+              </button>
             ))}
-          </select>
+          </div>
         </div>
-      </div>
 
-      {/* Group 4: Location & Floor Splits (Advanced) */}
-      <div className="form-section-title">Location & Floor details</div>
-      <div className="form-grid">
+        {/* Neighborhood Location Dropdown */}
         <div className="form-group">
-          <label className="form-label">Neighborhood Location</label>
+          <label className="form-label" style={{ display: 'flex', gap: '0.4rem' }}>
+            <MapPin size={16} style={{ color: 'var(--color-brand)' }} />
+            Neighborhood Location
+          </label>
           <select
-            name="Neighborhood"
             className="form-control"
             value={formData.Neighborhood}
-            onChange={handleChange}
-            style={{ fontWeight: 'bold' }}
+            onChange={(e) => handleChange('Neighborhood', e.target.value)}
+            style={{ fontWeight: 600 }}
           >
             {neighborhoods.map((nb) => (
               <option key={nb} value={nb}>{nb}</option>
             ))}
           </select>
         </div>
-
-        <div className="form-group">
-          <label className="form-label">1st Floor Area (sq ft)</label>
-          <input
-            type="number"
-            name="1stFlrSF"
-            className="form-control"
-            value={formData['1stFlrSF']}
-            onChange={handleChange}
-            required
-            min="0"
-          />
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">2nd Floor Area (sq ft)</label>
-          <input
-            type="number"
-            name="2ndFlrSF"
-            className="form-control"
-            value={formData['2ndFlrSF']}
-            onChange={handleChange}
-            required
-            min="0"
-          />
-        </div>
       </div>
 
       <div className="form-actions">
-        <button type="submit" className="btn btn-primary" style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}>
-          Predict House Price
+        <button type="submit" className="btn btn-primary" style={{ padding: '0.85rem 2.5rem', fontSize: '1.05rem', width: '100%' }}>
+          <Sparkles size={20} />
+          Estimate House Market Value
         </button>
       </div>
     </form>

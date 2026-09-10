@@ -4,7 +4,7 @@ import FeatureContributionChart from '../components/FeatureContributionChart';
 import ExplanationSummary from '../components/ExplanationSummary';
 import WhatIfPanel from '../components/WhatIfPanel';
 import { explainPrediction } from '../services/api';
-import { HelpCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Sliders, AlertCircle, RefreshCw, Sparkles, ArrowRight } from 'lucide-react';
 
 const Explain = ({
   lastFeatures,
@@ -26,7 +26,7 @@ const Explain = ({
       setExplanation(data);
     } catch (err) {
       console.error(err);
-      setError('Failed to load local explanation from backend. Ensure backend is running.');
+      setError('Failed to load local explanation from backend.');
     } finally {
       setLoading(false);
     }
@@ -38,21 +38,22 @@ const Explain = ({
 
   if (!lastFeatures || !lastPrediction) {
     return (
-      <div>
+      <div className="animate-fade-in">
         <div className="page-header">
-          <h1 className="page-title">Local Prediction Explanation</h1>
-          <p className="page-subtitle">Understand how individual features influenced a specific property estimate.</p>
+          <h1 className="page-title">Price Factor Breakdown</h1>
+          <p className="page-subtitle">Understand how individual house features shifted the estimated market value up or down.</p>
         </div>
-        <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <AlertCircle size={48} style={{ color: 'var(--color-academic)', marginBottom: '1rem' }} />
-          <h3 style={{ fontFamily: 'var(--font-serif)', color: 'var(--color-academic)', marginBottom: '0.75rem' }}>
-            No Active Prediction
+        <div className="card" style={{ textAlign: 'center', padding: '3.5rem 1.5rem' }}>
+          <AlertCircle size={44} style={{ color: 'var(--color-brand)', margin: '0 auto 1rem auto' }} />
+          <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '0.5rem' }}>
+            No Active Valuation Found
           </h3>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', maxWidth: '500px', margin: '0 auto 1.5rem auto' }}>
-            To see a local explanation, you must first input house features and get a price estimate.
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.75rem', maxWidth: '520px', margin: '0 auto 1.75rem auto' }}>
+            To view a detailed feature breakdown, please calculate a property estimate first using our valuation tool.
           </p>
           <button onClick={() => setCurrentPage('predict')} className="btn btn-primary">
-            Go to Predict Page
+            <Sparkles size={18} />
+            Go to Valuation Tool
           </button>
         </div>
       </div>
@@ -60,40 +61,40 @@ const Explain = ({
   }
 
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Local Prediction Explanation</h1>
-        <p className="page-subtitle">
-          Decomposing the {selectedModel} prediction of <strong>{lastPrediction.formatted_lakhs}</strong>.
-        </p>
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+    <div className="animate-fade-in">
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h1 className="page-title">Price Factor Breakdown</h1>
+          <p className="page-subtitle">
+            Decomposing the {selectedModel} valuation of <strong>{lastPrediction.formatted_lakhs}</strong>.
+          </p>
+        </div>
+        
         <button 
           onClick={fetchExplanation} 
           className="btn btn-secondary" 
-          style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', padding: '0.4rem 1rem', fontSize: '0.85rem' }}
           disabled={loading}
         >
-          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-          Refresh Explanation
+          <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+          Refresh Factors
         </button>
       </div>
 
       {loading && (
         <div className="card" style={{ padding: '3rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-academic)' }}>
-            Calculating local contributions...
+          <RefreshCw size={32} className="animate-spin" style={{ color: 'var(--color-brand)', margin: '0 auto 1rem auto' }} />
+          <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>
+            Computing Feature Contributions...
           </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-            Querying EBM scores / running SHAP kernels in the Python backend.
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.4rem' }}>
+            Calculating exact additive factors in Python backend.
           </p>
         </div>
       )}
 
       {error && (
         <div className="alert alert-warning" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <AlertCircle size={16} />
+          <AlertCircle size={18} />
           {error}
         </div>
       )}
