@@ -7,8 +7,8 @@ venv/
 ENV/
 env/
 .env
-*.pkl
-*.pickle
+# Allow model pkl files for deployment
+!*.pkl
 
 # Node / Frontend
 node_modules/
