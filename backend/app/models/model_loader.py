@@ -2,7 +2,21 @@ import os
 import joblib
 import json
 
-ARTIFACTS_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'artifacts')
+def find_artifacts_dir():
+    """Finds the artifacts directory across local and serverless Vercel environments."""
+    candidates = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'artifacts')),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'api', 'artifacts')),
+        os.path.abspath(os.path.join(os.getcwd(), 'api', 'artifacts')),
+        os.path.abspath(os.path.join(os.getcwd(), 'backend', 'artifacts')),
+        os.path.abspath(os.path.join(os.getcwd(), 'artifacts'))
+    ]
+    for path in candidates:
+        if os.path.exists(path) and os.path.exists(os.path.join(path, 'feature_metadata.json')):
+            return path
+    return candidates[0]
+
+ARTIFACTS_DIR = find_artifacts_dir()
 
 # Caches
 _models = {}
@@ -26,7 +40,13 @@ def get_model(model_name: str):
     if model_name not in _models:
         path = os.path.join(ARTIFACTS_DIR, file_name)
         if not os.path.exists(path):
-            raise FileNotFoundError(f"Model file {file_name} not found. Please train models first using backend/ml/train.py.")
+            # Try finding artifacts dir dynamically
+            dynamic_dir = find_artifacts_dir()
+            path = os.path.join(dynamic_dir, file_name)
+            
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Model file {file_name} not found at {path}.")
+            
         _models[model_name] = joblib.load(path)
         print(f"Loaded and cached model: {model_name}")
         
@@ -36,9 +56,9 @@ def get_preprocessor():
     """Loads and caches the data preprocessor."""
     global _preprocessor
     if _preprocessor is None:
-        path = os.path.join(ARTIFACTS_DIR, 'preprocessor.pkl')
+        path = os.path.join(find_artifacts_dir(), 'preprocessor.pkl')
         if not os.path.exists(path):
-            raise FileNotFoundError("Preprocessor file preprocessor.pkl not found. Please preprocess data first.")
+            raise FileNotFoundError(f"Preprocessor file preprocessor.pkl not found at {path}.")
         _preprocessor = joblib.load(path)
         print("Loaded and cached preprocessor.")
     return _preprocessor
@@ -47,9 +67,9 @@ def get_metadata():
     """Loads and caches the feature metadata (categories and ranges)."""
     global _metadata
     if _metadata is None:
-        path = os.path.join(ARTIFACTS_DIR, 'feature_metadata.json')
+        path = os.path.join(find_artifacts_dir(), 'feature_metadata.json')
         if not os.path.exists(path):
-            raise FileNotFoundError("Feature metadata file feature_metadata.json not found.")
+            raise FileNotFoundError(f"Feature metadata file feature_metadata.json not found at {path}.")
         with open(path, 'r') as f:
             _metadata = json.load(f)
         print("Loaded and cached feature metadata.")
@@ -59,9 +79,8 @@ def get_metrics():
     """Loads and caches model evaluation metrics."""
     global _metrics
     if _metrics is None:
-        path = os.path.join(ARTIFACTS_DIR, 'metrics.json')
+        path = os.path.join(find_artifacts_dir(), 'metrics.json')
         if not os.path.exists(path):
-            # Return dummy metrics if not trained yet
             return {}
         with open(path, 'r') as f:
             _metrics = json.load(f)
@@ -72,7 +91,7 @@ def get_importance():
     """Loads and caches global feature importances."""
     global _importance
     if _importance is None:
-        path = os.path.join(ARTIFACTS_DIR, 'feature_importance.json')
+        path = os.path.join(find_artifacts_dir(), 'feature_importance.json')
         if not os.path.exists(path):
             return {}
         with open(path, 'r') as f:

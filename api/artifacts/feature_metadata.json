@@ -1,0 +1,148 @@
+{
+  "OverallQual": {
+    "type": "numeric",
+    "min": 1.0,
+    "max": 10.0,
+    "median": 6.0,
+    "mean": 6.064419795221843,
+    "default": 6.0
+  },
+  "GrLivArea": {
+    "type": "numeric",
+    "min": 334.0,
+    "max": 5642.0,
+    "median": 1436.5,
+    "mean": 1492.8596416382252,
+    "default": 1436.5
+  },
+  "YearBuilt": {
+    "type": "numeric",
+    "min": 1872.0,
+    "max": 2010.0,
+    "median": 1972.0,
+    "mean": 1970.5068259385666,
+    "default": 1972.0
+  },
+  "YearRemodAdd": {
+    "type": "numeric",
+    "min": 1950.0,
+    "max": 2010.0,
+    "median": 1992.0,
+    "mean": 1983.9236348122868,
+    "default": 1992.0
+  },
+  "TotalBsmtSF": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 6110.0,
+    "median": 988.0,
+    "mean": 1046.5755119453925,
+    "default": 988.0
+  },
+  "GarageCars": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 4.0,
+    "median": 2.0,
+    "mean": 1.746160409556314,
+    "default": 2.0
+  },
+  "GarageArea": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 1488.0,
+    "median": 476.0,
+    "mean": 468.8788395904437,
+    "default": 476.0
+  },
+  "FullBath": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 4.0,
+    "median": 2.0,
+    "mean": 1.5571672354948805,
+    "default": 2.0
+  },
+  "BedroomAbvGr": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 8.0,
+    "median": 3.0,
+    "mean": 2.845136518771331,
+    "default": 3.0
+  },
+  "TotRmsAbvGrd": {
+    "type": "numeric",
+    "min": 2.0,
+    "max": 15.0,
+    "median": 6.0,
+    "mean": 6.409129692832765,
+    "default": 6.0
+  },
+  "Fireplaces": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 4.0,
+    "median": 1.0,
+    "mean": 0.5989761092150171,
+    "default": 1.0
+  },
+  "1stFlrSF": {
+    "type": "numeric",
+    "min": 334.0,
+    "max": 5095.0,
+    "median": 1082.0,
+    "mean": 1154.8144197952217,
+    "default": 1082.0
+  },
+  "2ndFlrSF": {
+    "type": "numeric",
+    "min": 0.0,
+    "max": 2065.0,
+    "median": 0.0,
+    "mean": 333.68813993174064,
+    "default": 0.0
+  },
+  "LotArea": {
+    "type": "numeric",
+    "min": 1300.0,
+    "max": 215245.0,
+    "median": 9356.5,
+    "mean": 10127.857508532423,
+    "default": 9356.5
+  },
+  "Neighborhood": {
+    "type": "categorical",
+    "categories": [
+      "Bloomington_Heights",
+      "Blueste",
+      "Briardale",
+      "Brookside",
+      "Clear_Creek",
+      "College_Creek",
+      "Crawford",
+      "Edwards",
+      "Gilbert",
+      "Green_Hills",
+      "Greens",
+      "Iowa_DOT_and_Rail_Road",
+      "Landmark",
+      "Meadow_Village",
+      "Mitchell",
+      "North_Ames",
+      "Northpark_Villa",
+      "Northridge",
+      "Northridge_Heights",
+      "Northwest_Ames",
+      "Old_Town",
+      "Sawyer",
+      "Sawyer_West",
+      "Somerset",
+      "South_and_West_of_Iowa_State_University",
+      "Stone_Brook",
+      "Timberland",
+      "Veenker"
+    ],
+    "default": "North_Ames"
+  }
+}
