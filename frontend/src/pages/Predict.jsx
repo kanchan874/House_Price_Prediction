@@ -38,8 +38,9 @@ const Predict = ({
       };
       setHistory((prev) => [newHistoryItem, ...prev]);
     } catch (err) {
-      console.error(err);
-      setError('Prediction request failed. Please ensure the backend server is running.');
+      console.error('Prediction error:', err);
+      const detailMsg = err?.response?.data?.detail || err?.message || 'Prediction request failed. Please check backend logs.';
+      setError(`Prediction request failed: ${detailMsg}`);
     } finally {
       setLoading(false);
     }

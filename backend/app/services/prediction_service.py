@@ -24,19 +24,8 @@ def predict_price(model_name: str, features: HouseFeatures) -> PredictionRespons
     elif model_name == 'Linear Regression':
         baseline_price = float(model.intercept_)
     elif model_name == 'Random Forest':
-        # For Random Forest, the baseline is the mean of training targets.
-        # We can extract it from the TreeExplainer or simply use a loaded average.
-        # To keep it consistent, let's load the TreeExplainer baseline or fallback to the mean 
-        # of the dataset target from metadata.
-        from app.models.model_loader import get_metadata
-        try:
-            # Fallback to the target mean calculated in metadata
-            import shap
-            explainer = shap.TreeExplainer(model)
-            baseline_price = float(explainer.expected_value[0])
-        except Exception:
-            # If shap explainer fails or is slow, fallback to target mean from train set
-            baseline_price = 180921.0 * 83.0  # Dataset mean approx in INR
+        # Fast baseline for RF (dataset target mean in INR)
+        baseline_price = 180921.0 * 83.0
             
     # Clean negative predictions (housing prices can't be negative)
     if raw_prediction < 0:
