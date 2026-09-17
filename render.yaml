@@ -20,4 +20,10 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: house-price-backend
+          property: host
     autoDeploy: true

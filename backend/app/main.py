@@ -18,8 +18,8 @@ app = FastAPI(
 # Enable CORS for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For local development, allow all origins
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -34,14 +34,23 @@ def startup_event():
     else:
         print("Warning: Model artifacts could not be loaded. Please ensure the model training pipeline has run.")
 
-# Mount routers
-app.include_router(prediction.router, prefix="/api", tags=["Prediction & What-If"])
-app.include_router(explanation.router, prefix="/api", tags=["Explainability (XAI)"])
-app.include_router(model_info.router, prefix="/api", tags=["Model Information"])
-
+# Root and API base endpoints
 @app.get("/")
 def read_root():
     return {
         "message": "Welcome to the House Price Prediction XAI API. Go to /docs for Swagger documentation.",
         "documentation": "/docs"
     }
+
+@app.get("/api")
+def read_api_root():
+    return {
+        "status": "healthy",
+        "message": "House Price Prediction API is active.",
+        "endpoints": ["/api/health", "/api/model-metrics", "/api/feature-metadata", "/api/feature-importance", "/api/predict", "/api/explain"]
+    }
+
+# Mount routers
+app.include_router(prediction.router, prefix="/api", tags=["Prediction & What-If"])
+app.include_router(explanation.router, prefix="/api", tags=["Explainability (XAI)"])
+app.include_router(model_info.router, prefix="/api", tags=["Model Information"])
