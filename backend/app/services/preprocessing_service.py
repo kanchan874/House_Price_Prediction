@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from app.models.schemas import HouseFeatures
-from app.models.model_loader import get_preprocessor
+from app.models.model_loader import get_preprocessor, fix_sklearn_imputers
 
 def preprocess_features(features: HouseFeatures) -> pd.DataFrame:
     """Converts HouseFeatures schema to a preprocessed pandas DataFrame.
@@ -19,6 +19,7 @@ def preprocess_features(features: HouseFeatures) -> pd.DataFrame:
     
     # 3. Load preprocessor and transform the single row
     preprocessor = get_preprocessor()
+    fix_sklearn_imputers(preprocessor)
     transformed_array = preprocessor.transform(df)
     
     # 4. Convert back to DataFrame with preprocessor's output feature names

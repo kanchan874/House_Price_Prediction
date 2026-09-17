@@ -52,6 +52,35 @@ def get_model(model_name: str):
         
     return _models[model_name]
 
+def fix_sklearn_imputers(obj):
+    """Patches missing scikit-learn attributes across version migrations (e.g. SimpleImputer._fill_dtype)."""
+    if obj is None:
+        return
+    # Check if object is SimpleImputer
+    if hasattr(obj, 'statistics_') and not hasattr(obj, '_fill_dtype'):
+        try:
+            import numpy as np
+            obj._fill_dtype = getattr(obj.statistics_, 'dtype', np.dtype(object))
+        except Exception:
+            obj._fill_dtype = None
+    # If ColumnTransformer
+    if hasattr(obj, 'transformers_'):
+        for item in obj.transformers_:
+            if isinstance(item, (list, tuple)) and len(item) >= 2:
+                fix_sklearn_imputers(item[1])
+    if hasattr(obj, 'transformers'):
+        for item in obj.transformers:
+            if isinstance(item, (list, tuple)) and len(item) >= 2:
+                fix_sklearn_imputers(item[1])
+    # If Pipeline
+    if hasattr(obj, 'named_steps'):
+        for step in obj.named_steps.values():
+            fix_sklearn_imputers(step)
+    if hasattr(obj, 'steps'):
+        for step in obj.steps:
+            if isinstance(step, (list, tuple)) and len(step) >= 2:
+                fix_sklearn_imputers(step[1])
+
 def get_preprocessor():
     """Loads and caches the data preprocessor."""
     global _preprocessor
@@ -60,7 +89,10 @@ def get_preprocessor():
         if not os.path.exists(path):
             raise FileNotFoundError(f"Preprocessor file preprocessor.pkl not found at {path}.")
         _preprocessor = joblib.load(path)
+        fix_sklearn_imputers(_preprocessor)
         print("Loaded and cached preprocessor.")
+    else:
+        fix_sklearn_imputers(_preprocessor)
     return _preprocessor
 
 def get_metadata():
